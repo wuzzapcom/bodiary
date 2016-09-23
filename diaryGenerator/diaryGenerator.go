@@ -6,7 +6,7 @@ import (
 	"math/rand"
 	"os"
 	"time"
-	"wuzzapcom/diary/helpers"
+	"wuzzapcom/bodiary/helpers"
 )
 
 type htmlGenerator struct {

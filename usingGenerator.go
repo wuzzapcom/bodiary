@@ -1,6 +1,6 @@
 package main
 
-import "wuzzapcom/diary/telegramForGenerator"
+import "wuzzapcom/bodiary/telegramForGenerator"
 import "log"
 import "os"
 

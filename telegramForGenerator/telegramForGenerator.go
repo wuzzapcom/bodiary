@@ -8,8 +8,8 @@ import (
 	"os"
 	"strconv"
 	"time"
-	"wuzzapcom/diary/diaryGenerator"
-	"wuzzapcom/diary/helpers"
+	"wuzzapcom/bodiary/diaryGenerator"
+	"wuzzapcom/bodiary/helpers"
 
 	"github.com/Syfaro/telegram-bot-api"
 )
