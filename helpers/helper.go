@@ -60,6 +60,19 @@ func FromGOB64(str string) RemiderDates {
 const NumberOfExersices = 3
 const NumberOfWeeks = 2
 const NumberOfDays = 2
+const NumberOfThreads = 2
+
+const AutomatonStates = 5
+const AutomatonSignals = 7
+
+//Automaton - transition table with structure [current state][input signal]int - new state
+var Automaton = [][]int{
+	[]int{0, 1, 0, 0, 0, 0, 0, 0},
+	[]int{1, 1, 1, 1, 2, 1, 1, 1},
+	[]int{2, 2, 2, 2, 2, 3, 2, 2},
+	[]int{3, 3, 3, 3, 3, 3, 4, 3},
+	[]int{4, 4, 4, 4, 4, 4, 4, 0},
+}
 
 const Help = `Команды :
 	/CreateNewUser - создание нового пользователя, без этого дальнейшее использование бота невозможно
