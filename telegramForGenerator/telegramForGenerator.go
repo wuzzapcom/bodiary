@@ -27,7 +27,7 @@ type TelegramForGenerator struct {
 func ConnectToTelegram() *TelegramForGenerator {
 	log.Println("Start ConnectToTelegram")
 
-	bot, err := tgbotapi.NewBotAPI("263647981:AAGCsCIqCVi3c089IJ47oLWc26Ix9SvbuPE")
+	bot, err := tgbotapi.NewBotAPI(loadAuthToken())
 	if err != nil {
 		log.Panic(err)
 	}
@@ -49,6 +49,7 @@ func ConnectToTelegram() *TelegramForGenerator {
 	telegram.updates = updates
 	telegram.loadReminder()
 	telegram.queue = make([]Queue, helpers.NumberOfThreads)
+	telegram.users = make(map[int64]int)
 	for i := 0; i < helpers.NumberOfThreads; i++ {
 		telegram.queue[i] = Queue{channel: make(chan tgbotapi.Update), telegram: telegram}
 		go telegram.queue[i].workWithClient()
@@ -57,6 +58,16 @@ func ConnectToTelegram() *TelegramForGenerator {
 	log.Println("End ConnectToTelegram")
 
 	return telegram
+
+}
+
+func loadAuthToken() string {
+
+	val, _ := ioutil.ReadFile(helpers.PathToAuthToken)
+
+	str := string(val)
+
+	return str[:len(str)-1]
 
 }
 
@@ -105,6 +116,8 @@ func (telegram *TelegramForGenerator) loadBalancer(update tgbotapi.Update) {
 
 	}
 
+	fmt.Printf("Message uploaded to clannel[%d]\n", minNum)
+
 	telegram.queue[minNum].channel <- update
 
 }
@@ -132,9 +145,11 @@ func (telegram *TelegramForGenerator) WorkWithClient() {
 		}
 
 		_, err := telegram.users[update.Message.Chat.ID]
-		if err == true {
+		//fmt.Println("TEST : ", v, err)
+		if err == false {
 			telegram.users[update.Message.Chat.ID] = 0
 		}
+		//fmt.Println("Test : ", telegram.users)
 
 		telegram.loadBalancer(update)
 
@@ -157,27 +172,17 @@ func (telegram *TelegramForGenerator) sendHTMLFileToUser(username string, id int
 
 }
 
-//createFile tested
-func (telegram *TelegramForGenerator) createFile(username string) *os.File {
-	log.Println("Start createFile")
-
-	file, _ := os.Create(pathToUserDirectories + username + ".user")
-
-	log.Println("End createFile")
-
-	return file
-
-}
-
 func (telegram *TelegramForGenerator) openFile(username string, exp string) *os.File {
 
 	log.Println("Start openFile")
 
-	file, err := os.Open(pathToUserDirectories + username + exp)
+	file, err := os.OpenFile(pathToUserDirectories+username+exp, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0777)
 
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
 	}
+
+	//file.WriteString("govnoзшвщ")
 
 	log.Println("End openFile")
 

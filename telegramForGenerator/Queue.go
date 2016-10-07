@@ -42,12 +42,9 @@ func (queue *Queue) workWithClient() {
 func (queue *Queue) handleStateZero(update tgbotapi.Update) {
 	if update.Message.Command() == "CreateNewUser" {
 
+		fmt.Printf("Test : %d, %d\n", update.Message.Chat.ID, helpers.Automaton[0][1])
 		queue.telegram.updateUserState(update.Message.Chat.ID, helpers.Automaton[0][1])
 		queue.telegram.sendQueryToUser(update.Message.Chat.ID, "Введите имя студента")
-
-		//queue.telegram.getBasicInformationFromClient(update, queue.channel)
-		//userValues := queue.telegram.GetUserValues(update.Message.Chat.UserName, update.Message.Chat.ID)
-		//diaryGenerator.GenerateDiary(userValues)
 
 	} else if update.Message.Command() == "GetDiary" {
 
@@ -68,37 +65,41 @@ func (queue *Queue) handleStateZero(update tgbotapi.Update) {
 
 func (queue *Queue) handleStateOne(update tgbotapi.Update) {
 
-	queue.telegram.updateUserState(update.Message.Chat.ID, helpers.Automaton[1][4])
+	queue.telegram.updateUserState(update.Message.Chat.ID, helpers.Automaton[1][2])
 
 	file := queue.telegram.openFile(update.Message.Chat.UserName, ".user")
 	file.WriteString(update.Message.Text + "\n")
 	queue.telegram.sendQueryToUser(update.Message.Chat.ID, "Введите группу")
+	file.Close()
 
 }
 
 func (queue *Queue) handleStateTwo(update tgbotapi.Update) {
 
-	queue.telegram.updateUserState(update.Message.Chat.ID, helpers.Automaton[2][5])
+	queue.telegram.updateUserState(update.Message.Chat.ID, helpers.Automaton[2][3])
 
 	file := queue.telegram.openFile(update.Message.Chat.UserName, ".user")
 	file.WriteString(update.Message.Text + "\n")
 	queue.telegram.sendQueryToUser(update.Message.Chat.ID, "Введите начальный пульс")
+	file.Sync()
+	file.Close()
 
 }
 
 func (queue *Queue) handleStateThree(update tgbotapi.Update) {
 
-	queue.telegram.updateUserState(update.Message.Chat.ID, helpers.Automaton[3][6])
+	queue.telegram.updateUserState(update.Message.Chat.ID, helpers.Automaton[3][4])
 
 	file := queue.telegram.openFile(update.Message.Chat.UserName, ".user")
 	file.WriteString(update.Message.Text + "\n")
 	queue.telegram.sendQueryToUser(update.Message.Chat.ID, "Введите конечный пульс")
+	file.Close()
 
 }
 
 func (queue *Queue) handleStateFour(update tgbotapi.Update) {
 
-	queue.telegram.updateUserState(update.Message.Chat.ID, helpers.Automaton[4][7])
+	queue.telegram.updateUserState(update.Message.Chat.ID, helpers.Automaton[4][5])
 
 	file := queue.telegram.openFile(update.Message.Chat.UserName, ".user")
 	file.WriteString(update.Message.Text + "\n")
