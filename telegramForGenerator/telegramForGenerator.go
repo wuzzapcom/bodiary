@@ -16,11 +16,10 @@ const pathToUserDirectories = "" //"/Users/wuzzapcom/test/"
 
 //TelegramForGenerator is main object
 type TelegramForGenerator struct {
-	bot      *tgbotapi.BotAPI
-	updates  <-chan tgbotapi.Update
-	queue    []Queue
-	users    map[int64]int
-	reminder helpers.RemiderDates
+	bot     *tgbotapi.BotAPI
+	updates <-chan tgbotapi.Update
+	queue   []Queue
+	users   map[int64]int
 }
 
 //ConnectToTelegram Creates a connection to telegram, returns telegram object and channel with messages
@@ -47,7 +46,6 @@ func ConnectToTelegram() *TelegramForGenerator {
 
 	telegram.bot = bot
 	telegram.updates = updates
-	telegram.loadReminder()
 	telegram.queue = make([]Queue, helpers.NumberOfThreads)
 	telegram.users = make(map[int64]int)
 	for i := 0; i < helpers.NumberOfThreads; i++ {
@@ -68,31 +66,6 @@ func loadAuthToken() string {
 	str := string(val)
 
 	return str[:len(str)-1]
-
-}
-
-func (telegram *TelegramForGenerator) loadReminder() {
-
-	log.Println("Start loadReminder")
-
-	_, err := os.Stat(pathToUserDirectories + "reminderDates.serialize")
-
-	if err == nil {
-
-		data, _ := ioutil.ReadFile(pathToUserDirectories + "reminderDates.serialize")
-		telegram.reminder = helpers.FromGOB64(string(data))
-
-	} else {
-
-		telegram.reminder = make(helpers.RemiderDates) //*(new(helpers.RemiderDates))
-		for i := 0; i < 7; i++ {
-			telegram.reminder[i] = make([]helpers.Pair, 0)
-		}
-		os.Create(pathToUserDirectories + "reminderDates.serialize")
-
-	}
-
-	log.Println("End loadReminder")
 
 }
 
@@ -145,11 +118,10 @@ func (telegram *TelegramForGenerator) WorkWithClient() {
 		}
 
 		_, err := telegram.users[update.Message.Chat.ID]
-		//fmt.Println("TEST : ", v, err)
+
 		if err == false {
 			telegram.users[update.Message.Chat.ID] = 0
 		}
-		//fmt.Println("Test : ", telegram.users)
 
 		telegram.loadBalancer(update)
 
@@ -182,8 +154,6 @@ func (telegram *TelegramForGenerator) openFile(username string, exp string) *os.
 		fmt.Println(err)
 	}
 
-	//file.WriteString("govnoзшвщ")
-
 	log.Println("End openFile")
 
 	return file
@@ -205,24 +175,6 @@ func (telegram *TelegramForGenerator) sendMessageUserDoesNotExit(userID int64) {
 	telegram.bot.Send(tgbotapi.NewMessage(userID, "Пользователь не существует, воспользуйтесь командой /CreateNewUser"))
 
 	log.Println("End sendMessageUserDoesNotExit")
-
-}
-
-func (telegram *TelegramForGenerator) saveReminder() {
-
-	log.Println("Start saveReminder")
-
-	reminderFile, err := os.OpenFile(pathToUserDirectories+"reminderDates.serialize", os.O_WRONLY, os.ModeAppend)
-
-	if err != nil {
-		fmt.Println(err.Error())
-	}
-	reminderFile.WriteString(helpers.ToGOB64(telegram.reminder))
-	reminderFile.Close()
-
-	//.Println(helpers.ToGOB64(telegram.reminder))
-
-	log.Println("End saveReminder")
 
 }
 
@@ -256,8 +208,6 @@ func (telegram *TelegramForGenerator) GetUserValues(username string, id int64) *
 
 	start := 0
 	userValues := new(helpers.UserValues)
-
-	userValues.UserName = username
 
 	for i, val := range data {
 
@@ -311,60 +261,3 @@ func (telegram *TelegramForGenerator) GetUserValues(username string, id int64) *
 	return userValues
 
 }
-
-//===================
-//REMINDER-NOT FINISHED
-
-// func (telegram *TelegramForGenerator) sendReminderInfinityLoop() {
-// 	log.Println("Start sendReminderInfinityLoop")
-//
-// 	for {
-// 		//telegram.sendRemind()
-// 		telegram.sendRemindToUser(helpers.Pair{ID: telegram.id, UserName: telegram.username, RemindThisWeek: true})
-// 		break
-//
-// 	}
-//
-// 	log.Println("End sendReminderInfinityLoop")
-//
-// }
-//
-// func (telegram *TelegramForGenerator) sendRemind() {
-// 	log.Println("Start sendRemind")
-//
-// 	currentDayOfWeek := (int(time.Now().Weekday()) + 6) % 7
-//
-// 	if len(telegram.reminder[currentDayOfWeek]) != 0 && time.Now().Hour() > 17 {
-//
-// 		for i, val := range telegram.reminder[currentDayOfWeek] {
-//
-// 			if val.RemindThisWeek {
-//
-// 				telegram.sendRemindToUser(val)
-// 				telegram.reminder[currentDayOfWeek][i].RemindThisWeek = false
-//
-// 			} else {
-// 				telegram.reminder[currentDayOfWeek][i].RemindThisWeek = true
-// 			}
-//
-// 		}
-//
-// 	}
-//
-// 	log.Println("End sendRemind")
-//
-// }
-//
-// func (telegram *TelegramForGenerator) sendRemindToUser(user helpers.Pair) {
-// 	log.Println("Start sendRemindToUser")
-//
-// 	text := fmt.Sprintf("Привет, %s! Пришло время сдать дневник самоподготовки.", user.UserName)
-// 	message := tgbotapi.NewMessage(user.ID, text)
-//
-// 	telegram.bot.Send(message)
-//
-// 	telegram.sendHTMLFileToUser(user.ID, user.UserName)
-//
-// 	log.Println("End sendRemindToUser")
-//
-// }

@@ -7,6 +7,8 @@ import (
 	"github.com/Syfaro/telegram-bot-api"
 )
 
+//TODO Integrate DB and current working code
+
 //Queue ...
 type Queue struct {
 	channel  chan tgbotapi.Update

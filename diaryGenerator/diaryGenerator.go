@@ -198,7 +198,7 @@ func (generator *htmlGenerator) checkForTwoDaysInRow(day int) bool {
 func GenerateDiary(userValues *helpers.UserValues) {
 	log.Println("Start GenerateDiary")
 	rand.Seed(getTimeInMilliseconds())
-	file, _ := os.Create(fmt.Sprintf("%s.html", userValues.UserName))
+	file, _ := os.Create(fmt.Sprintf("%s.html", userValues.Name))
 	generator := htmlGenerator{file, make(DaysMap), userValues}
 
 	generator.generateRows()
