@@ -72,7 +72,7 @@ func (generator *htmlGenerator) generateRows() {
 		for j := 0; j < helpers.NumberOfDays; j++ {
 
 			day := generator.generateDayOfWeek()
-			for i := 0; i < 2 && generator.checkForTwoDaysInRow(day); i++ {
+			for k := 0; k < 2 && generator.checkForTwoDaysInRow(day); k++ {
 
 				day = generator.generateDayOfWeek()
 

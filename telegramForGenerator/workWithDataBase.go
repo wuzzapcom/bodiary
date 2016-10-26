@@ -41,6 +41,12 @@ func (mongo *Mongo) addToDB(userValues *helpers.UserValues) {
 
 }
 
+func (mongo *Mongo) getUserValuesByID(id int64) *helpers.UserValues {
+	var result helpers.UserValues
+	mongo.collection.Find(bson.M{"id": id}).One(&result)
+	return &result
+}
+
 func (mongo *Mongo) findUsersToRemind() {
 
 	var users []helpers.UserValues

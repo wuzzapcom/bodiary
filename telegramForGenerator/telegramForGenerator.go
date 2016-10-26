@@ -137,11 +137,12 @@ func (telegram *TelegramForGenerator) WorkWithClient() {
 func (telegram *TelegramForGenerator) sendHTMLFileToUser(username string, id int64) {
 
 	log.Println("Start sendHTMLFileToUser")
-	userValues := telegram.GetUserValues(username, id)
-	if userValues != nil {
-		diaryGenerator.GenerateDiary(userValues)
-		telegram.bot.Send(tgbotapi.NewDocumentUpload(id, pathToUserDirectories+username+".html"))
-	}
+
+	userValues := telegram.mongo.getUserValuesByID(id)
+	fmt.Println(userValues)
+	diaryGenerator.GenerateDiary(userValues)
+	telegram.bot.Send(tgbotapi.NewDocumentUpload(id, userValues.Name+".html"))
+	os.Remove(userValues.Name + ".html")
 
 	log.Println("End sendHTMLFileToUser")
 

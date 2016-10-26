@@ -91,29 +91,39 @@ func (queue *Queue) handleStateTwo(update tgbotapi.Update) {
 
 func (queue *Queue) handleStateThree(update tgbotapi.Update) {
 
-	queue.telegram.updateUserState(update.Message.Chat.ID, helpers.Automaton[3][4])
-	pulse, _ := strconv.Atoi(update.Message.Text)
+	pulse, err := strconv.Atoi(update.Message.Text)
+	if err != nil {
+		queue.telegram.sendQueryToUser(update.Message.Chat.ID, "Ошибочные данные, попробуйте еще раз")
+	}
 	queue.users[update.Message.Chat.ID].StartPulse = pulse
-
 	queue.telegram.sendQueryToUser(update.Message.Chat.ID, "Введите конечный пульс")
+	queue.telegram.updateUserState(update.Message.Chat.ID, helpers.Automaton[3][4])
 
 }
 
 func (queue *Queue) handleStateFour(update tgbotapi.Update) {
 
-	queue.telegram.updateUserState(update.Message.Chat.ID, helpers.Automaton[4][5])
-	pulse, _ := strconv.Atoi(update.Message.Text)
+	pulse, err := strconv.Atoi(update.Message.Text)
+	if err != nil {
+		queue.telegram.sendQueryToUser(update.Message.Chat.ID, "Ошибочные данные, попробуйте еще раз")
+	}
 	queue.users[update.Message.Chat.ID].EndPulse = pulse
 	queue.telegram.sendQueryToUser(update.Message.Chat.ID, "Введите, раз в сколько дней присылать вам напоминания")
+	queue.telegram.updateUserState(update.Message.Chat.ID, helpers.Automaton[4][5])
 
 }
 
 func (queue *Queue) handleStateFive(update tgbotapi.Update) {
-	queue.telegram.updateUserState(update.Message.Chat.ID, helpers.Automaton[5][6])
-	period, _ := strconv.Atoi(update.Message.Text)
+
+	period, err := strconv.Atoi(update.Message.Text)
+	if err != nil {
+		queue.telegram.sendQueryToUser(update.Message.Chat.ID, "Ошибочные данные, попробуйте еще раз")
+	}
 	queue.users[update.Message.Chat.ID].Period = period
 	queue.users[update.Message.Chat.ID].DaysUntilSend = period
 	queue.telegram.mongo.addToDB(queue.users[update.Message.Chat.ID])
 	delete(queue.users, update.Message.Chat.ID)
 	queue.telegram.sendQueryToUser(update.Message.Chat.ID, "Готово!")
+	queue.telegram.updateUserState(update.Message.Chat.ID, helpers.Automaton[5][6])
+
 }
