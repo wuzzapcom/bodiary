@@ -1,19 +1,11 @@
 package main
 
-import "wuzzapcom/bodiary/telegramForGenerator"
-import "log"
-import "os"
+import "wuzzapcom/bodiary/Telegram"
 
 func main() {
 
-	telegram := telegramForGenerator.ConnectToTelegram()
+	telegram := Telegram.ConnectToTelegram()
 
 	telegram.WorkWithClient()
-
-	log.SetOutput(os.Stdout)
-
-	//userValues := telegram.GetUserValues()
-
-	//diaryGenerator.GenerateDiary(userValues)
 
 }
