@@ -1,6 +1,7 @@
 package telegramForGenerator
 
 import (
+	"fmt"
 	"wuzzapcom/bodiary/helpers"
 
 	"gopkg.in/mgo.v2"
@@ -44,9 +45,11 @@ func (mongo *Mongo) findUsersToRemind() {
 
 	var users []helpers.UserValues
 
-	mongo.collection.Find(bson.M{"DaysUntilSend": 0}).Iter().All(&users)
+	mongo.collection.Find(bson.M{"daysuntilsend": 0}).Iter().All(&users)
 
 	for _, user := range users {
+
+		fmt.Println(user.Name)
 
 		//mongo.telegram.sendQuery(user.)    //TODO FINISH THIS STRING
 
@@ -56,15 +59,9 @@ func (mongo *Mongo) findUsersToRemind() {
 
 func (mongo *Mongo) updateUserValues() {
 
-	query := bson.M{"DaysUntilSend": bson.M{"$ne": 0}}
-
-	change := bson.M{"$set": "$dec"}
-
-	mongo.collection.UpdateAll(query, change)
-
 	var users []helpers.UserValues
-	mongo.collection.Find(bson.M{"DaysUntilSend": 0}).Iter().All(&users)
-	mongo.collection.RemoveAll(bson.M{"DaysUntilSend": 0})
+	mongo.collection.Find(bson.M{"daysuntilsend": 0}).Iter().All(&users)
+	mongo.collection.RemoveAll(bson.M{"daysuntilsend": 0})
 
 	for _, user := range users {
 		user.DaysUntilSend = user.Period
@@ -73,4 +70,11 @@ func (mongo *Mongo) updateUserValues() {
 			panic(err)
 		}
 	}
+
+	change := bson.M{"$inc": bson.M{"daysuntilsend": -1}}
+
+	query := bson.M{"daysuntilsend": bson.M{"$ne": 0}}
+
+	mongo.collection.UpdateAll(query, change)
+
 }
