@@ -20,6 +20,7 @@ type TelegramForGenerator struct {
 	updates <-chan tgbotapi.Update
 	queue   []Queue
 	users   map[int64]int
+	mongo   *Mongo
 }
 
 //ConnectToTelegram Creates a connection to telegram, returns telegram object and channel with messages
@@ -48,8 +49,10 @@ func ConnectToTelegram() *TelegramForGenerator {
 	telegram.updates = updates
 	telegram.queue = make([]Queue, helpers.NumberOfThreads)
 	telegram.users = make(map[int64]int)
+	telegram.mongo = new(Mongo)
+	telegram.mongo.init(telegram)
 	for i := 0; i < helpers.NumberOfThreads; i++ {
-		telegram.queue[i] = Queue{channel: make(chan tgbotapi.Update), telegram: telegram}
+		telegram.queue[i] = Queue{channel: make(chan tgbotapi.Update), telegram: telegram, users: make(map[int64]*helpers.UserValues)}
 		go telegram.queue[i].workWithClient()
 	}
 

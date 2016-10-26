@@ -2,6 +2,7 @@ package telegramForGenerator
 
 import (
 	"fmt"
+	"strconv"
 	"wuzzapcom/bodiary/helpers"
 
 	"github.com/Syfaro/telegram-bot-api"
@@ -13,6 +14,7 @@ import (
 type Queue struct {
 	channel  chan tgbotapi.Update
 	telegram *TelegramForGenerator
+	users    map[int64]*helpers.UserValues
 }
 
 func (queue *Queue) workWithClient() {
@@ -35,7 +37,8 @@ func (queue *Queue) workWithClient() {
 			queue.handleStateThree(update)
 		case 4:
 			queue.handleStateFour(update)
-
+		case 5:
+			queue.handleStateFive(update)
 		}
 
 	}
@@ -47,6 +50,8 @@ func (queue *Queue) handleStateZero(update tgbotapi.Update) {
 		fmt.Printf("Test : %d, %d\n", update.Message.Chat.ID, helpers.Automaton[0][1])
 		queue.telegram.updateUserState(update.Message.Chat.ID, helpers.Automaton[0][1])
 		queue.telegram.sendQueryToUser(update.Message.Chat.ID, "Введите имя студента")
+		queue.users[update.Message.Chat.ID] = new(helpers.UserValues)
+		queue.users[update.Message.Chat.ID].ID = update.Message.Chat.ID
 
 	} else if update.Message.Command() == "GetDiary" {
 
@@ -69,42 +74,46 @@ func (queue *Queue) handleStateOne(update tgbotapi.Update) {
 
 	queue.telegram.updateUserState(update.Message.Chat.ID, helpers.Automaton[1][2])
 
-	file := queue.telegram.openFile(update.Message.Chat.UserName, ".user")
-	file.WriteString(update.Message.Text + "\n")
+	queue.users[update.Message.Chat.ID].Name = update.Message.Text
+
 	queue.telegram.sendQueryToUser(update.Message.Chat.ID, "Введите группу")
-	file.Close()
 
 }
 
 func (queue *Queue) handleStateTwo(update tgbotapi.Update) {
 
 	queue.telegram.updateUserState(update.Message.Chat.ID, helpers.Automaton[2][3])
+	queue.users[update.Message.Chat.ID].Group = update.Message.Text
 
-	file := queue.telegram.openFile(update.Message.Chat.UserName, ".user")
-	file.WriteString(update.Message.Text + "\n")
 	queue.telegram.sendQueryToUser(update.Message.Chat.ID, "Введите начальный пульс")
-	file.Sync()
-	file.Close()
 
 }
 
 func (queue *Queue) handleStateThree(update tgbotapi.Update) {
 
 	queue.telegram.updateUserState(update.Message.Chat.ID, helpers.Automaton[3][4])
+	pulse, _ := strconv.Atoi(update.Message.Text)
+	queue.users[update.Message.Chat.ID].StartPulse = pulse
 
-	file := queue.telegram.openFile(update.Message.Chat.UserName, ".user")
-	file.WriteString(update.Message.Text + "\n")
 	queue.telegram.sendQueryToUser(update.Message.Chat.ID, "Введите конечный пульс")
-	file.Close()
 
 }
 
 func (queue *Queue) handleStateFour(update tgbotapi.Update) {
 
 	queue.telegram.updateUserState(update.Message.Chat.ID, helpers.Automaton[4][5])
+	pulse, _ := strconv.Atoi(update.Message.Text)
+	queue.users[update.Message.Chat.ID].EndPulse = pulse
+	queue.telegram.sendQueryToUser(update.Message.Chat.ID, "Введите, раз в сколько дней присылать вам напоминания")
 
-	file := queue.telegram.openFile(update.Message.Chat.UserName, ".user")
-	file.WriteString(update.Message.Text + "\n")
+}
+
+func (queue *Queue) handleStateFive(update tgbotapi.Update) {
+	queue.telegram.updateUserState(update.Message.Chat.ID, helpers.Automaton[5][6])
+	period, _ := strconv.Atoi(update.Message.Text)
+	queue.users[update.Message.Chat.ID].Period = period
+	queue.users[update.Message.Chat.ID].DaysUntilSend = period
+	queue.telegram.mongo.addToDB(queue.users[update.Message.Chat.ID])
+	delete(queue.users, update.Message.Chat.ID)
 	queue.telegram.sendQueryToUser(update.Message.Chat.ID, "Готово!")
-
 }

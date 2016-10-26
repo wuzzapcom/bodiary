@@ -51,7 +51,7 @@ func (mongo *Mongo) findUsersToRemind() {
 
 		fmt.Println(user.Name)
 
-		//mongo.telegram.sendQuery(user.)    //TODO FINISH THIS STRING
+		mongo.telegram.sendQueryToUser(user.ID, fmt.Sprintf("%s, Hello! It`s time to print your diary", user.Name))
 
 	}
 
