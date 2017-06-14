@@ -11,3 +11,13 @@ type UserData struct{
 	EndPulse int `json:"endpulse"`
 
 }
+
+type UserTemplateData struct {
+
+	Name string
+	Group string
+	FirstWeekNumber int
+	SecondWeekNumber int
+	FirstWeekExersices [7]string
+	SecondWeekExersices [7]string
+}
