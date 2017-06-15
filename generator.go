@@ -44,7 +44,7 @@ func (generator *Generator) generate(userData UserData, pathToTemplate string, p
 
 	templateData := generator.generateUserTemplateData(userData)
 
-	pathToFile = pathToHTMLFolder + "/" + userData.Name + ".html"
+	pathToFile = pathToHTMLFolder + "/" + strconv.FormatInt(userData.ID, 10) + ".html"
 
 	f, err := os.Create(pathToFile)
 	if err != nil{
@@ -113,6 +113,10 @@ func (generator *Generator) generateUserExersiceDay(userData UserData) string {
 		exersices = append(exersices[ :randNum ], exersices[ randNum+1:]...)
 
 	}
+
+	result += "Количество повторений : 3х12\n"
+	result += "Пульс в начале : " + strconv.Itoa(userData.StartPulse + rand.Intn(10) - 5) + "\n"
+	result += "Пульс в конце : " + strconv.Itoa(userData.EndPulse + rand.Intn(10) - 5) + "\n"
 
 	return result
 

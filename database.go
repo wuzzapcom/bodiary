@@ -3,6 +3,8 @@ package main
 import "io/ioutil"
 import "encoding/json"
 import "log"
+import "strings"
+import "strconv"
 
 /*
 	TODO
@@ -27,7 +29,7 @@ import "log"
 
 type Database struct{}
 
-func (database *Database) save(userData *UserData, path string){
+func (database *Database) save(userData UserData, path string){
 
 	convertedJSON, err := json.Marshal(userData)
 
@@ -39,30 +41,60 @@ func (database *Database) save(userData *UserData, path string){
 		return
 	}
 
-	ioutil.WriteFile(path + "/" + userData.Name + ".json", convertedJSON, 0644)
+	ioutil.WriteFile(path + "/" + strconv.FormatInt(userData.ID, 10) + ".json", convertedJSON, 0644)
 
 }
 
-func (database *Database) load(userName string, path string) (*UserData, error) {
+func (database *Database) load(userName string, path string) (UserData, error) {
 
-	data, err := ioutil.ReadFile(path + "/" + userName + ".json")
+	userData := UserData{}
+
+	data, err := ioutil.ReadFile(path + "/" + userName)
 	if err != nil {
 		log.Println("Error with reading file")
 		log.Println(err)
-		return nil, err
+		return userData, err
 	}
-
-	userData := new(UserData)
 
 	err = json.Unmarshal(data, &userData)
 	if err != nil {
 		log.Println("Error with decoding JSON")
 		log.Println(err)
-		return nil, err
+		return userData, err
 	}
 
 	log.Println(userData)
 
 	return userData, nil
+
+}
+
+func (database *Database) loadAllFiles(path string) map[int64]UserData{
+
+	result := make(map[int64]UserData)
+
+	files, err := ioutil.ReadDir(path)
+	if err != nil{
+		log.Println("Failed reading dir")
+		log.Println(err)
+		return nil
+	}
+
+	for _, file := range files {
+
+		if strings.Contains(file.Name(), ".json") {
+
+			userData, err := database.load(file.Name(), path)
+			if err != nil{
+				continue
+			}
+			result[userData.ID] = userData
+
+		}
+
+	}
+
+	return result
+
 
 }

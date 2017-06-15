@@ -7,16 +7,16 @@ import "log"
 
 func main(){
 
-	if len(os.Args) != 3{
+	if len(os.Args) != 5{
 
-		fmt.Println("Set folder with user metadata or auth file")
+		fmt.Println("Set folder with user metadata or auth file or path to HTML template or path to user`s htmls")
 		return
 
 	}
 
 	telegram := new(Telegram)
 
-	err := telegram.Connect(os.Args[1], openAuthFile(os.Args[2]))
+	err := telegram.Connect(os.Args[1], openAuthFile(os.Args[2]), os.Args[3], os.Args[4])
 
 	if err != nil {
 		log.Println("Connect problem")
