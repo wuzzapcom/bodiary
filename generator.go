@@ -108,7 +108,7 @@ func (generator *Generator) generateUserExersiceDay(userData UserData) string {
 
 		randNum := rand.Intn(len(exersices))
 
-		result += strconv.Itoa(i) + ") " + exersices[randNum] + "\n"
+		result += strconv.Itoa(i + 1) + ") " + exersices[randNum] + "\n"
 
 		exersices = append(exersices[ :randNum ], exersices[ randNum+1:]...)
 

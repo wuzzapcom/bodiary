@@ -6,6 +6,7 @@ import(
 	"github.com/Syfaro/telegram-bot-api"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type Telegram struct{
@@ -58,6 +59,8 @@ func (telegram *Telegram) Connect(pathToUsersFolders string, authKey string, pat
 
 func (telegram *Telegram) Start() {
 
+	go telegram.startSendNotificationLoop()
+
 	log.Println("Starting server")
 
 	for update := range telegram.updates{ //update.Message.Chat.ID
@@ -68,6 +71,34 @@ func (telegram *Telegram) Start() {
 
 		log.Println("Message from user " + update.Message.Chat.FirstName)
 		telegram.handleUpdate(update)
+	}
+
+}
+
+func (telegram *Telegram) startSendNotificationLoop(){
+
+	engToRuWeekdays := map[string]byte{"Monday" : 0, "Tuesday" : 1, "Wednesday" : 2, "Thursday" : 3, "Friday" : 4, "Saturday" : 5, "Sunday": 6}
+
+	for true {
+
+		currentTime := time.Now()
+
+		for key, val := range telegram.users {
+
+			if engToRuWeekdays[currentTime.Weekday().String()] == val.DayToRemind {
+
+				if currentTime.Hour() == val.HourToRemind {
+
+					telegram.sendMessage(REMIND_MESSAGE, key)
+
+				}
+
+			}
+
+		}
+
+		time.Sleep(time.Hour)
+
 	}
 
 }
@@ -144,18 +175,19 @@ func (telegram *Telegram) fillUserDataWithMessage(userData UserData, text string
 
 	daysOfWeek := []string{"Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"}
 
+	log.Println(data[4])
+
 	var i byte
 
-	for i = 0; i < 7; i++ {
+	for i = 0; i < 8; i++ {
 
-		if data[4] == daysOfWeek[i]{
+		if i == 7 {
+			return userData, "Такого дня недели не существует"
+		}else if strings.Compare(data[4], daysOfWeek[i]) == 0{
 			userData.DayToRemind = i
+			break
 		}
 
-	}
-
-	if i != 7 {
-		return userData, "Такого дня недели не существует"
 	}
 
 	userData.Name = data[0]
@@ -202,7 +234,7 @@ func (telegram *Telegram) checkDataCorrectness(text string) (errorMessage string
 	if err != nil{
 		return "Время напоминания некорректно"
 	}
-	if n1 < 0 || n1 > 24{
+	if n1 < -2 || n1 > 24{
 		return "Время напоминания некорректно"
 	}
 
