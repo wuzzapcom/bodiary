@@ -1,13 +1,26 @@
 package main
 
-import "os"
-import "fmt"
-import "io/ioutil"
-import "log"
+import (
+	"flag"
+	"fmt"
+	"io/ioutil"
+	"log"
+	"os"
+)
 
-func main(){
+func main() {
 
-	if len(os.Args) != 5{
+	pathToUsersFolders := flag.String(pathToUsersFoldersFlag, "", pathToAuthFileHelp)
+
+	pathToAuthFile := flag.String(pathToAuthFileFlag, "auth.private", pathToAuthFileHelp)
+
+	pathToHTMLFile := flag.String(pathToHTMLTemplateFlag, "template.html", pathToHTMLTempleteHelp)
+
+	pathToGeneratedFolder := flag.String(pathToGeneratedFilesFlag, "", pathToGeneratedFilesHelp)
+
+	flag.Parse()
+
+	if len(os.Args) != 5 {
 
 		fmt.Println("Set folder with user metadata or auth file or path to HTML template or path to user`s htmls")
 		return
@@ -16,7 +29,7 @@ func main(){
 
 	telegram := new(Telegram)
 
-	err := telegram.Connect(os.Args[1], openAuthFile(os.Args[2]), os.Args[3], os.Args[4])
+	err := telegram.Connect(*pathToUsersFolders, openAuthFile(*pathToAuthFile), *pathToHTMLFile, *pathToGeneratedFolder)
 
 	if err != nil {
 		log.Println("Connect problem")
@@ -28,11 +41,11 @@ func main(){
 
 }
 
-func openAuthFile(pathToAuthFile string) string{
+func openAuthFile(pathToAuthFile string) string {
 
 	data, err := ioutil.ReadFile(pathToAuthFile)
 
-	if err != nil{
+	if err != nil {
 		log.Println("Failed reading from file")
 		log.Println(err)
 		panic(err)

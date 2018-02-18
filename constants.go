@@ -1,7 +1,7 @@
 package main
 
-const HELP_MESSAGE = "Чтобы получить дневник, необходимо внести свои данные с помощью команды /createNewUser. После чего вы сможете получить свой дневник командой /getDiary."
-const CREATE_USER_MESSAGE = `Введите, пожалуйста, ваши данные в формате
+const helpMessage = "Чтобы получить дневник, необходимо внести свои данные с помощью команды /createNewUser. После чего вы сможете получить свой дневник командой /getDiary."
+const createUserMessage = `Введите, пожалуйста, ваши данные в формате
 								Имя
 								Группа
 								Пульс в спокойном состоянии
@@ -16,8 +16,16 @@ const CREATE_USER_MESSAGE = `Введите, пожалуйста, ваши да
 								Понедельник
 								14
 								`
-const REMIND_MESSAGE = "Самое время распечатать дневник."
-const USER_NOT_REGISTERED_MESSAGE = "Вы еще не внесли свои данные, так что создать дневник невозможно."
-const ERROR_MESSAGE = "Данные некорректны, попробуйте еще раз"
-const SUCCESS_USER_CREATION = "Пользователь успешно создан"
-const NUMBER_OF_FIELDS_IN_CREATE_USER_MESSAGE = 6
+const remindMessage = "Самое время распечатать дневник."
+const userNotRegisteredMessage = "Вы еще не внесли свои данные, так что создать дневник невозможно."
+const errorMessage = "Данные некорректны, попробуйте еще раз"
+const successUserCreation = "Пользователь успешно создан"
+const numberOfFieldsInCreateUserMessage = 6
+const pathToUsersFoldersFlag = "pathToUsersFolders"
+const pathToUsersFoldersHelp = "Папка, в которой будут храниться метаданные пользователей."
+const pathToAuthFileFlag = "pathToAuthFile"
+const pathToAuthFileHelp = "Путь к файлу, в котором находится ключ телеграм-бота."
+const pathToHTMLTemplateFlag = "pathToHtmlTemplate"
+const pathToHTMLTempleteHelp = "Путь к файлу, который является go-совместимым HTML-темплейтом."
+const pathToGeneratedFilesFlag = "pathToGeneratedFiles"
+const pathToGeneratedFilesHelp = "Путь к папке, где будут храниться сгенерированные HTML-файлы дневников."
