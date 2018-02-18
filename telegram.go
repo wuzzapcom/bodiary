@@ -5,10 +5,12 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/Syfaro/telegram-bot-api"
 )
 
+//Telegram ..
 type Telegram struct {
 	bot                *tgbotapi.BotAPI
 	updates            <-chan tgbotapi.Update
@@ -18,6 +20,7 @@ type Telegram struct {
 	pathToUsersFolders string
 }
 
+//Connect ..
 func (telegram *Telegram) Connect(pathToUsersFolders string, authKey string, pathToTemplate string, pathToHTMLFolder string) error {
 
 	log.Println("Start connect, path is " + pathToUsersFolders)
@@ -55,7 +58,10 @@ func (telegram *Telegram) Connect(pathToUsersFolders string, authKey string, pat
 
 }
 
+//Start ..
 func (telegram *Telegram) Start() {
+
+	go telegram.startSendNotificationLoop()
 
 	log.Println("Starting server")
 
@@ -67,6 +73,34 @@ func (telegram *Telegram) Start() {
 
 		log.Println("Message from user " + update.Message.Chat.FirstName)
 		telegram.handleUpdate(update)
+	}
+
+}
+
+func (telegram *Telegram) startSendNotificationLoop() {
+
+	engToRuWeekdays := map[string]byte{"Monday": 0, "Tuesday": 1, "Wednesday": 2, "Thursday": 3, "Friday": 4, "Saturday": 5, "Sunday": 6}
+
+	for true {
+
+		currentTime := time.Now()
+
+		for key, val := range telegram.users {
+
+			if engToRuWeekdays[currentTime.Weekday().String()] == val.DayToRemind {
+
+				if currentTime.Hour() == val.HourToRemind {
+
+					telegram.sendMessage(remindMessage, key)
+
+				}
+
+			}
+
+		}
+
+		time.Sleep(time.Hour)
+
 	}
 
 }
@@ -143,18 +177,19 @@ func (telegram *Telegram) fillUserDataWithMessage(userData UserData, text string
 
 	daysOfWeek := []string{"Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"}
 
+	log.Println(data[4])
+
 	var i byte
 
-	for i = 0; i < 7; i++ {
+	for i = 0; i < 8; i++ {
 
-		if data[4] == daysOfWeek[i] {
+		if i == 7 {
+			return userData, "Такого дня недели не существует"
+		} else if strings.Compare(data[4], daysOfWeek[i]) == 0 {
 			userData.DayToRemind = i
+			break
 		}
 
-	}
-
-	if i != 7 {
-		return userData, "Такого дня недели не существует"
 	}
 
 	userData.Name = data[0]
@@ -201,7 +236,7 @@ func (telegram *Telegram) checkDataCorrectness(text string) (errorMessage string
 	if err != nil {
 		return "Время напоминания некорректно"
 	}
-	if n1 < 0 || n1 > 24 {
+	if n1 < -2 || n1 > 24 {
 		return "Время напоминания некорректно"
 	}
 

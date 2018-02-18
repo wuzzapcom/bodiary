@@ -28,16 +28,16 @@ import "strconv"
 
 */
 
-type Generator struct{
-
+//
+type Generator struct {
 }
 
-func (generator *Generator) generate(userData UserData, pathToTemplate string, pathToHTMLFolder string) (pathToFile string){
+func (generator *Generator) generate(userData UserData, pathToTemplate string, pathToHTMLFolder string) (pathToFile string) {
 
 	htmlTemplate := template.New("diary")
 
 	htmlTemplate, err := htmlTemplate.Parse(generator.openTemplate(pathToTemplate))
-	if err != nil{
+	if err != nil {
 		log.Println("Failed parsing template")
 		log.Println(err)
 	}
@@ -47,7 +47,7 @@ func (generator *Generator) generate(userData UserData, pathToTemplate string, p
 	pathToFile = pathToHTMLFolder + "/" + strconv.FormatInt(userData.ID, 10) + ".html"
 
 	f, err := os.Create(pathToFile)
-	if err != nil{
+	if err != nil {
 		log.Println("Error with creating file")
 		log.Println(err)
 		return ""
@@ -61,7 +61,7 @@ func (generator *Generator) generate(userData UserData, pathToTemplate string, p
 
 }
 
-func (generator *Generator) generateUserTemplateData(userData UserData) UserTemplateData{
+func (generator *Generator) generateUserTemplateData(userData UserData) UserTemplateData {
 
 	templateData := UserTemplateData{}
 
@@ -81,13 +81,13 @@ func (generator *Generator) generateUserTemplateData(userData UserData) UserTemp
 
 		randNum := rand.Intn(7)
 		for templateData.FirstWeekExersices[randNum] != "День отдыха" {
-			 randNum = rand.Intn(7) 
+			randNum = rand.Intn(7)
 		}
 		templateData.FirstWeekExersices[randNum] = generator.generateUserExersiceDay(userData)
 
 		randNum = rand.Intn(7)
 		for templateData.SecondWeekExersices[randNum] != "День отдыха" {
-			 randNum = rand.Intn(7) 
+			randNum = rand.Intn(7)
 		}
 		templateData.SecondWeekExersices[randNum] = generator.generateUserExersiceDay(userData)
 
@@ -108,25 +108,25 @@ func (generator *Generator) generateUserExersiceDay(userData UserData) string {
 
 		randNum := rand.Intn(len(exersices))
 
-		result += strconv.Itoa(i) + ") " + exersices[randNum] + "\n"
+		result += strconv.Itoa(i+1) + ") " + exersices[randNum] + "\n"
 
-		exersices = append(exersices[ :randNum ], exersices[ randNum+1:]...)
+		exersices = append(exersices[:randNum], exersices[randNum+1:]...)
 
 	}
 
 	result += "Количество повторений : 3х12\n"
-	result += "Пульс в начале : " + strconv.Itoa(userData.StartPulse + rand.Intn(10) - 5) + "\n"
-	result += "Пульс в конце : " + strconv.Itoa(userData.EndPulse + rand.Intn(10) - 5) + "\n"
+	result += "Пульс в начале : " + strconv.Itoa(userData.StartPulse+rand.Intn(10)-5) + "\n"
+	result += "Пульс в конце : " + strconv.Itoa(userData.EndPulse+rand.Intn(10)-5) + "\n"
 
 	return result
 
 }
 
-func (generator *Generator) openTemplate(pathToTemplate string) string{
+func (generator *Generator) openTemplate(pathToTemplate string) string {
 
 	data, err := ioutil.ReadFile(pathToTemplate)
 
-	if err != nil{
+	if err != nil {
 		log.Println("Failed reading from file")
 		log.Println(err)
 		panic(err)
