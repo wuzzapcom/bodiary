@@ -28,7 +28,7 @@ import "strconv"
 
 */
 
-//
+//Generator ..
 type Generator struct {
 }
 

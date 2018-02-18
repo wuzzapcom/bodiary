@@ -27,6 +27,7 @@ import "strconv"
 
 */
 
+//Database ..
 type Database struct{}
 
 func (database *Database) save(userData UserData, path string){
