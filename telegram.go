@@ -109,11 +109,11 @@ func (telegram *Telegram) handleUpdate(update tgbotapi.Update) {
 
 	log.Println("update.Message.Command = " + update.Message.Command())
 
-	if update.Message.Command() == "help" {
+	if update.Message.Command() == helpCommand {
 
 		telegram.sendMessage(helpMessage, update.Message.Chat.ID)
 
-	} else if update.Message.Command() == "createNewUser" {
+	} else if update.Message.Command() == createNewUserCommand {
 
 		telegram.sendMessage(createUserMessage, update.Message.Chat.ID)
 
@@ -127,7 +127,7 @@ func (telegram *Telegram) handleUpdate(update tgbotapi.Update) {
 			EndPulse:     -1,
 		}
 
-	} else if update.Message.Command() == "getDiary" {
+	} else if update.Message.Command() == getDiaryCommand {
 
 		userData, err := telegram.users[update.Message.Chat.ID]
 		if !err {
