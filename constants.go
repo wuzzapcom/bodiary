@@ -15,13 +15,13 @@ const createUserMessage = `Введите, пожалуйста, ваши дан
 								155
 								Понедельник
 								14
-							Если вы не хотите получать уведомления, то напишите любой день недели, а вместо времени отправьте -1.
+							Если вы не хотите получать уведомления, то не указывайте последние два пункта.
 								`
 const remindMessage = "Самое время распечатать дневник."
 const userNotRegisteredMessage = "Вы еще не внесли свои данные, так что создать дневник невозможно."
 const errorMessage = "Данные некорректны, попробуйте еще раз"
 const successUserCreation = "Пользователь успешно создан"
-const numberOfFieldsInCreateUserMessage = 6
+const minimalNumberOfFieldsInCreateUserMessage = 4
 const pathToUsersFoldersFlag = "pathToUsersFolders"
 const pathToUsersFoldersHelp = "Папка, в которой будут храниться метаданные пользователей."
 const pathToAuthFileFlag = "pathToAuthFile"

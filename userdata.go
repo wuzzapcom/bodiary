@@ -3,7 +3,7 @@ package main
 //UserData ..
 type UserData struct {
 	ID           int64  `json:"id"`
-	DayToRemind  byte   `json:"daytoremind"`
+	DayToRemind  int    `json:"daytoremind"`
 	HourToRemind int    `json:"hourtoremind"`
 	Name         string `json:"name"`
 	Group        string `json:"group"`

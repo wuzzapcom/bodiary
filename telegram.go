@@ -79,7 +79,7 @@ func (telegram *Telegram) Start() {
 
 func (telegram *Telegram) startSendNotificationLoop() {
 
-	engToRuWeekdays := map[string]byte{"Monday": 0, "Tuesday": 1, "Wednesday": 2, "Thursday": 3, "Friday": 4, "Saturday": 5, "Sunday": 6}
+	engToRuWeekdays := map[string]int{"Monday": 0, "Tuesday": 1, "Wednesday": 2, "Thursday": 3, "Friday": 4, "Saturday": 5, "Sunday": 6}
 
 	for true {
 
@@ -175,30 +175,34 @@ func (telegram *Telegram) fillUserDataWithMessage(userData UserData, text string
 
 	data := strings.Split(text, "\n")
 
-	daysOfWeek := []string{"Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"}
-
-	log.Println(data[4])
-
-	var i byte
-
-	for i = 0; i < 8; i++ {
-
-		if i == 7 {
-			return userData, "Такого дня недели не существует"
-		} else if strings.Compare(data[4], daysOfWeek[i]) == 0 {
-			userData.DayToRemind = i
-			break
-		}
-
-	}
-
 	userData.Name = data[0]
 	userData.Group = data[1]
 
 	userData.StartPulse, _ = strconv.Atoi(data[2])
 	userData.EndPulse, _ = strconv.Atoi(data[3])
 
-	userData.HourToRemind, _ = strconv.Atoi(data[5])
+	if len(data) > 4 {
+
+		daysOfWeek := []string{"Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"}
+
+		var i int
+
+		for i = 0; i < 8; i++ {
+
+			if i == 7 {
+				return userData, "Такого дня недели не существует"
+			} else if strings.Compare(data[4], daysOfWeek[i]) == 0 {
+				userData.DayToRemind = i
+				break
+			}
+
+		}
+
+		userData.HourToRemind, _ = strconv.Atoi(data[5])
+	} else {
+		userData.DayToRemind = -1
+		userData.HourToRemind = -1
+	}
 
 	return userData, ""
 
@@ -212,7 +216,7 @@ func (telegram *Telegram) checkDataCorrectness(text string) (errorMessage string
 
 	data := strings.Split(text, "\n")
 
-	if len(data) != numberOfFieldsInCreateUserMessage {
+	if len(data) != minimalNumberOfFieldsInCreateUserMessage {
 		return "Недостаточно данных"
 	}
 
@@ -232,12 +236,16 @@ func (telegram *Telegram) checkDataCorrectness(text string) (errorMessage string
 		return "Конечный пульс некорректен"
 	}
 
-	n1, err = strconv.Atoi(data[5])
-	if err != nil {
-		return "Время напоминания некорректно"
-	}
-	if n1 < -2 || n1 > 24 {
-		return "Время напоминания некорректно"
+	if len(data) > minimalNumberOfFieldsInCreateUserMessage {
+
+		n1, err = strconv.Atoi(data[5])
+		if err != nil {
+			return "Время напоминания некорректно"
+		}
+		if n1 < -2 || n1 > 24 {
+			return "Время напоминания некорректно"
+		}
+
 	}
 
 	return ""
