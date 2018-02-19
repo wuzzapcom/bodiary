@@ -31,5 +31,5 @@ const pathToHTMLTempleteHelp = "Путь к файлу, который явля�
 const pathToGeneratedFilesFlag = "pathToGeneratedFiles"
 const pathToGeneratedFilesHelp = "Путь к папке, где будут храниться сгенерированные HTML-файлы дневников."
 const helpCommand = "help"
-const createNewUserCommand = "createNewUser"
-const getDiaryCommand = "getDiary"
+const createNewUserCommand = "create_new_user"
+const getDiaryCommand = "get_diary"
